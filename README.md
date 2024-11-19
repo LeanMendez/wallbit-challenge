@@ -1,65 +1,87 @@
-[![Wallbit](./assets/logo.jpg)](https://wallbit.io/)
-
-> El banco digital para trabajadores remotos.
-
 # Wallbit Junior Frontend Challenge
+<div align="center">
+<img src="./public/wallbit.webp" alt="wallbit con carrito con productos" />
+<br>
+<img src="./public/wallbit-empty.webp" alt="wallbit con carrito vacio" />
+</div>
 
-Para este desafío, nuestro cliente nos encargó hacer un carrito de compras para programadores. Tiene un formulario con 2 campos: ID del producto y cantidad. Los programadores habitualmente no necesitan saber ni ver que productos comprar, sino que saben por conexiones astrales cual es el ID del producto que quieren y así los agregan a su carrito.
+## 📝 Descripción
+Este repositorio tiene como objetivo resolver el desafío de Wallbit para el puesto de Junior Frontend presentado en el [stream](https://www.twitch.tv/goncypozzo) de Gonzalo "Goncy" Pozzo. 
 
-Cada vez que se agrega un producto, vamos a obtener el producto desde la API y lo vamos a mostrar en una tabla, junto a la cantidad que el usuario eligió.
+## 🚀 Features
+### Requeridos
+- Agregar productos al carrito de compras por ID y cantidad.
+- Mostrar productos agregados en una tabla.
+    - Cantidad
+    - Nombre del producto
+    - Precio unitario
+    - Precio total
+    - Imagen
+- Manejar errores que devuelve la API o cualquier interacción con el formulario por parte del usuario.
 
-> Solo lo mostramos visualmente por si hay alguien que no sea programador mirando la pantalla.
+### Extras
+- Mostrar el cantidad total de productos agregados.
+- Mostrar el costo total del carrito.
+- Mostrar la fecha de creación del carrito.
+    - La fecha de creacion es la fecha en la que se crea el carrito (se agrega el primer producto).
+    - La fecha se elimina al eliminar todos los productos del carrito
+    - La fecha se mantiene al recargar la página
+- El carrito tiene persistencia en LocalStorage, por lo que si refrescamos la página, los productos y su fecha de creación se mantienen.
 
-La aplicación se vería así:
+### Bonus
+- Controles para cambiar la cantidad de productos desde el carrito.
+    - El usuario puede aumentar o disminuir la cantidad del producto, si este llega a cero, el producto es eliminado del carrito.
+- Se agregaron validaciones al formulario para que el usuario no pueda agregar productos con cantidades negativas o cero. Como asi tampoco tipos de datos incorrectos.
+- Accesibilidad por teclado, todos los componentes son accesibles por teclado.
+- Skeleton de carga mientras se obtienen los productos de la API.
+- UI con estilos limpios y minimalistas.
 
-![Sin productos](./assets/app-0.jpg)
-> Inicialmente no hay productos en el carrito
 
-![Con productos](./assets/app-1.jpg)
-> Con productos en el carrito
+## 🛠 Tecnologías utilizadas 
+- React
+- TypeScript
+- Tailwind CSS
+- Shadcn/UI Components
+- React Hook Form
+- Zod Validation
+- LocalStorage API
 
-## Requisitos
+## 📋 Prerequisitos para la instalación
+- Node.js (v18 or later)
+- pnpm
 
-La API que nos dió nuestro cliente es: [Fake Store API](https://fakestoreapi.com/). El cliente nos dijo que su stack de frontend es React, que prefiere el challenge hecho con eso, pero está abierto a cualquier stack que quieras usar.
+## 🔧 Instalación
 
-- [ ] Podemos agregar productos al carrito.
-- [ ] Manejar errores que nos devuelva la API.
-- [ ] Mostrar una lista con los productos agregados incluyendo `title`, `price` e `image` del producto y la `cantidad` que el usuario agregó.
+1. Clonar el repositorio
+```bash
+git clone https://github.com/LeanMendez/wallbit-challenge.git
+cd wallbit-challenge
+```
 
-## Extras
+2. Instalar las dependencias del proyecto con pnpm
+```bash
+pnpm install
+```
 
-- [ ] El carrito se persiste al recargar la página.
-- [ ] Mostrar el total de productos agregados.
-- [ ] Mostrar el costo total del carrito.
-- [ ] Mostrar la fecha de creación del carrito.
+4. Correr el servidor de desarrollo
+```bash
+pnpm run dev
+```
 
-## Bonus
+## 📦 Estructura básica del proyecto
+```
+src/
+├── components/
+│   ├── Cart/
+│   ├── AddProduct/
+│   └── ui/
+├── hooks/
+├── lib/
+└── App.tsx
+```
 
-Para destacar, podés agregar cualquier cosa que se te ocurra que llame la atención. No tiene por qué ser necesariamente en el código, o una dependencia. Puede ser algo visual, un easter egg, una funcionalidad, o bueno, algo en el código.
 
-> [!NOTE]
-> Siempre recordá que lo que agregues debe sumar a la experiencia del usuario y no complicar su navegación. Tenés que pensar que quien va a usar la aplicación no va a haber hablado con vos previamente y aun así debería poder usar la aplicación y obtener la mejor experiencia posible.
-
-## Entregables
-
-- [ ] Crear un Pull Request a este repositorio con tu solución.
-- [ ] Reemplazar el `README.md` con instrucciones para correr el proyecto e información relevante para la evaluación.
-- [ ] Incluir el link al deploy de tu aplicación.
-
-## Premio
-
-Se va a entregar un premio en vivo durante [mi stream](https://twitch.tv/goncypozzo) el 19 de Noviembre de 2024 a las 19:00hs Argentina (GMT -3) entre todos los que completen el desafío. El premio va a ser un micrófono Razer Seiren Mini.
-
-El ganador va a ser elegido por el chat, la gente de Wallbit y yo.
-
-> [!IMPORTANT]
-> El ganador debe estar presente en el stream para recibir el premio.
-
-![Razer Seiren Mini](./assets/sorteo.jpg)
-
-> En caso de no poder enviarse el premio, se pagará el equivalente de 70 USD.
-
-El deadline para enviar el PR es el 19 de Noviembre de 2024 a las 15:00hs Argentina (GMT -3).
-
-> [!IMPORTANT]
-> Los PRs se cerrarán luego de esa hora así que no te olvides de hacerlo antes.
+## 📞 Contacto
+- Leandro Méndez - leandroa.mendez@gmail.com
+- Link del repositorio: https://github.com/LeanMendez/wallbit-challenge.git
+- Link a la demo: https://wallbit-challenge-lean-mendez.vercel.app/
