@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { currencyTransform, totalPrice, totalQuantity } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import CartSkeleton from "../CartSkeleton/CartSkeleton";
@@ -28,14 +29,14 @@ interface CartProps {
 }
 
 const Cart: React.FC<CartProps> = ({ productId, quantity }) => {
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    const { getItem } = useLocalStorage<CartItem[]>("cart");
-    return getItem() || [];
-  });
-  const [cartDate, setCartDate] = useState<string | null>(() => {
-    const { getItem } = useLocalStorage<string>("cartDate");
-    return getItem() ?? null;
-  });
+  const cartStorage = useLocalStorage<CartItem[]>("cart");
+  const cartDateStorage = useLocalStorage<string>("cartDate");
+  const [cart, setCart] = useState<CartItem[]>(
+    () => cartStorage.getItem() || []
+  );
+  const [cartDate, setCartDate] = useState<string | null>(
+    () => cartDateStorage.getItem() ?? null
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,18 +58,15 @@ const Cart: React.FC<CartProps> = ({ productId, quantity }) => {
       }
 
       const product: Product = await response.json();
-
       const notNullQty = Math.max(0, quantity);
 
       if (!cartDate) {
         const newDate = new Date().toLocaleString();
         setCartDate(newDate);
-        const { setItem } = useLocalStorage<string>("cartDate");
-        setItem(newDate);
+        cartDateStorage.setItem(newDate);
       }
 
       setCart((prevCart) => {
-        const { setItem } = useLocalStorage<CartItem[]>("cart");
         const existingItemIndex = prevCart.findIndex(
           (item) => item.id === product.id
         );
@@ -80,7 +78,7 @@ const Cart: React.FC<CartProps> = ({ productId, quantity }) => {
             quantity: newCart[existingItemIndex].quantity + notNullQty,
           };
 
-          setItem(newCart);
+          cartStorage.setItem(newCart);
           return newCart;
         } else {
           const newItem: CartItem = {
@@ -88,8 +86,9 @@ const Cart: React.FC<CartProps> = ({ productId, quantity }) => {
             quantity: notNullQty,
           };
 
-          setItem([...prevCart, newItem]);
-          return [...prevCart, newItem];
+          const newCart = [...prevCart, newItem];
+          cartStorage.setItem(newCart);
+          return newCart;
         }
       });
     } catch (error) {
@@ -98,6 +97,24 @@ const Cart: React.FC<CartProps> = ({ productId, quantity }) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleQuantityChange = (itemId: number, newQuantity: number) => {
+    setCart((prevCart) => {
+      const updatedCart = prevCart.map((item) =>
+        item.id === itemId ? { ...item, quantity: newQuantity } : item
+      );
+
+      const filteredCart = updatedCart.filter((item) => item.quantity > 0);
+
+      if (filteredCart.length === 0) {
+        setCartDate(null);
+        cartDateStorage.removeItem();
+      }
+
+      cartStorage.setItem(filteredCart);
+      return filteredCart;
+    });
   };
 
   useEffect(() => {
@@ -114,9 +131,11 @@ const Cart: React.FC<CartProps> = ({ productId, quantity }) => {
     <div className="space-y-4">
       <div>
         <h2 className="text-2xl">Carrito de compra</h2>
-        <span className="text-sm text-gray-500 tracking-wide">
-          {cartDate ? `Iniciado: ${cartDate.toLocaleString()}` : ""}
-        </span>
+        {cartDate && (
+          <span className="text-sm text-gray-500 tracking-wide">
+            Iniciado: {cartDate.toLocaleString()}
+          </span>
+        )}
       </div>
 
       {isLoading ? (
@@ -136,43 +155,62 @@ const Cart: React.FC<CartProps> = ({ productId, quantity }) => {
             <TableBody>
               {cart && cart.length > 0 ? (
                 cart.map((item) => (
-                  <>
-                    <TableRow key={item.id}>
-                      <TableCell className="font-medium">
-                        {item.quantity ?? 0}
-                      </TableCell>
-                      <TableCell className="font-medium truncate max-w-[250px]">
-                        {item.title}
-                      </TableCell>
-                      <TableCell>{currencyTransform(item.price)}</TableCell>
-                      <TableCell>
-                        {currencyTransform(item.price * (item.quantity ?? 0))}
-                      </TableCell>
-                      <TableCell className="flex justify-center items-center text-right">
-                        <img
-                          className="h-16"
-                          src={item.image}
-                          alt={item.title}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  </>
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium px-2">
+                    <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            handleQuantityChange(
+                              item.id,
+                              Math.max(0, item.quantity - 1)
+                            )
+                          }
+                        >
+                          -
+                        </Button>
+                        <span className="font-medium px-1">{item.quantity}</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            handleQuantityChange(item.id, item.quantity + 1)
+                          }
+                        >
+                          +
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium truncate max-w-[250px]">
+                      {item.title}
+                    </TableCell>
+                    <TableCell>{currencyTransform(item.price)}</TableCell>
+                    <TableCell>
+                      {currencyTransform(item.price * (item.quantity ?? 0))}
+                    </TableCell>
+                    <TableCell className="flex justify-center items-center text-right">
+                      <img className="h-16" src={item.image} alt={item.title} />
+                    </TableCell>
+                  </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">
+                  <TableCell colSpan={6} className="text-center">
                     No hay productos en el carrito
                   </TableCell>
                 </TableRow>
               )}
-              <TableRow>
-                <TableCell colSpan={3} className="h-3 font-medium">
-                  La cantidad de productos es de: {totalQuantity(cart)}
-                </TableCell>
-                <TableCell colSpan={2} className="h-3 font-medium">
-                  Total: {currencyTransform(totalPrice(cart))}
-                </TableCell>
-              </TableRow>
+              {cart.length > 0 && (
+                <TableRow>
+                  <TableCell colSpan={3} className="h-3 font-medium">
+                    La cantidad de productos es de: {totalQuantity(cart)}
+                  </TableCell>
+                  <TableCell colSpan={3} className="h-3 font-medium">
+                    Total: {currencyTransform(totalPrice(cart))}
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </section>

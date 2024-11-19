@@ -13,16 +13,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-export interface SearchItemData {
+export interface IAddProductData {
   productId: number;
   quantity: number;
 }
 
-export interface SearchItemProps {
-  onSearch: (data: SearchItemData) => void;
+export interface IAddProductProps {
+  onSearch: (data: IAddProductData) => void;
 }
 
-const SearchItem: React.FC<SearchItemProps> = ({ onSearch }) => {
+const AddProduct: React.FC<IAddProductProps> = ({ onSearch }) => {
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     onSearch({
       productId: data.productId,
@@ -109,4 +109,4 @@ const SearchItem: React.FC<SearchItemProps> = ({ onSearch }) => {
   );
 };
 
-export default SearchItem;
+export default AddProduct;
